@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}Kafe Düzenle - Kafe API Sitesi{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category != 'success' %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- Update Cafe Form -->
+        <div class="row">
+            <div class="col-12">
+                <div class="form-container">
+                    <h2 class="form-title">
+                        <i class="fas fa-edit"></i> Kafe Düzenle
+                    </h2>
+                    <p class="text-muted text-center mb-4">{{ cafe.name }} kafesini düzenleyin!</p>
+
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <!-- Basic Information -->
+                        <div class="form-section">
+                            <h5 class="section-title">
+                                <i class="fas fa-info-circle"></i> Temel Bilgiler
+                            </h5>
+
+                            <div class="row">
+                                <div class="col-lg-4 mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-store text-primary me-2"></i>{{ form.name.label.text }}
+                                    </label>
+                                    {{ form.name(class="form-control", placeholder="Kafenin adını girin") }}
+                                    {% for error in form.name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="col-lg-4 mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-lira-sign text-primary me-2"></i>{{ form.coffee_price.label.text }}
+                                    </label>
+                                    {{ form.coffee_price(class="form-control", placeholder="Kahve fiyatını girin (örn: 15.50)") }}
+                                    {% for error in form.coffee_price.errors %}
+                                        <div class="text-danger small mt-1">
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="col-lg-4 mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-flag text-primary me-2"></i>{{ form.country.label.text }}
+                                    </label>
+                                    {{ form.country(class="form-control", placeholder="Ülke (örn: Türkiye)") }}
+                                    {% for error in form.country.errors %}
+                                        <div class="text-danger small mt-1">
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location Information -->
+                        <div class="form-section">
+                            <h5 class="section-title">
+                                <i class="fas fa-map-marker-alt"></i> Konum Bilgileri
+                            </h5>
+
+                            <div class="row">
+                                <div class="col-lg-6 mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-location-dot text-primary me-2"></i>{{ form.location.label.text }}
+                                    </label>
+                                    {{ form.location(class="form-control", placeholder="Şehir, mahalle (örn: Kadıköy, İstanbul)") }}
+                                    {% for error in form.location.errors %}
+                                        <div class="text-danger small mt-1">
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="col-lg-6 mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-map text-primary me-2"></i>{{ form.map_url.label.text }}
+                                    </label>
+                                    {{ form.map_url(class="form-control", placeholder="https://maps.google.com/...") }}
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle"></i> Google Maps veya harita linki
+                                    </div>
+                                    {% for error in form.map_url.errors %}
+                                        <div class="text-danger small mt-1">
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image URL -->
+                        <div class="form-section">
+                            <h5 class="section-title">
+                                <i class="fas fa-image"></i> Fotoğraf
+                            </h5>
+
+                            <div class="row">
+                                <div class="col-lg-8 mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-image text-primary me-2"></i>{{ form.img_url.label.text }}
+                                    </label>
+                                    {{ form.img_url(class="form-control", placeholder="https://example.com/kahve-resmi.jpg") }}
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle"></i> Kafenin fotoğrafı için URL
+                                    </div>
+                                    {% for error in form.img_url.errors %}
+                                        <div class="text-danger small mt-1">
+                                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Amenities -->
+                        <div class="form-section">
+                            <h5 class="section-title">
+                                <i class="fas fa-star"></i> Özellikler
+                            </h5>
+                            <p class="text-muted mb-4">Kafenin sahip olduğu özellikleri işaretleyin:</p>
+
+                            <div class="row">
+                                <div class="col-lg-3 col-md-6 mb-3">
+                                    <div class="amenity-checkbox">
+                                        <div class="form-check">
+                                            {{ form.has_wifi(class="form-check-input", id="wifi") }}
+                                            <label class="form-check-label" for="wifi">
+                                                <i class="fas fa-wifi amenity-icon wifi"></i>
+                                                <div class="amenity-content">
+                                                    <span class="amenity-text">WiFi</span>
+                                                    <small class="text-muted amenity-desc">Ücretsiz internet erişimi</small>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-6 mb-3">
+                                    <div class="amenity-checkbox">
+                                        <div class="form-check">
+                                            {{ form.has_toilet(class="form-check-input", id="toilet") }}
+                                            <label class="form-check-label" for="toilet">
+                                                <i class="fas fa-toilet amenity-icon toilet"></i>
+                                                <div class="amenity-content">
+                                                    <span class="amenity-text">Tuvalet</span>
+                                                    <small class="text-muted amenity-desc">Müşteri tuvaleti mevcut</small>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-6 mb-3">
+                                    <div class="amenity-checkbox">
+                                        <div class="form-check">
+                                            {{ form.has_sockets(class="form-check-input", id="sockets") }}
+                                            <label class="form-check-label" for="sockets">
+                                                <i class="fas fa-plug amenity-icon sockets"></i>
+                                                <div class="amenity-content">
+                                                    <span class="amenity-text">Priz</span>
+                                                    <small class="text-muted amenity-desc">Elektrik prizi mevcut</small>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-6 mb-3">
+                                    <div class="amenity-checkbox">
+                                        <div class="form-check">
+                                            {{ form.can_take_calls(class="form-check-input", id="calls") }}
+                                            <label class="form-check-label" for="calls">
+                                                <i class="fas fa-phone amenity-icon calls"></i>
+                                                <div class="amenity-content">
+                                                    <span class="amenity-text">Telefon</span>
+                                                    <small class="text-muted amenity-desc">Telefon konuşması yapılabilir</small>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-actions">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{{ url_for('normal.user_cafes') }}" class="btn btn-outline-secondary me-md-2">
+                                    <i class="fas fa-times-circle"></i> İptal
+                                </a>
+                                {{ form.submit(class="btn btn-warning", value="Kafe Güncelle") }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

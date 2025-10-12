@@ -1,0 +1,10 @@
+# Flask Configuration
+FLASK_ENV=development
+SECRET_KEY=your-secret-key-here
+FERNET_KEY=your-fernet-key-here
+
+# Database Configuration
+DATABASE_URL=sqlite:///cafes.db
+
+# Production Database (PostgreSQL)
+# DATABASE_URL=postgresql://username:password@localhost:5432/cafes_db

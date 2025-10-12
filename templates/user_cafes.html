@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}Kafelerim - Kafe API Sitesi{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category == 'success' %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show flash-message" role="alert">
+                    <i class="fas fa-check-circle"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- Header Section -->
+        <div class="user-cafes-header text-center mb-5">
+            <h1 class="display-4 text-primary mb-3">
+                <i class="fas fa-store"></i> Kafelerim
+            </h1>
+            <p class="lead text-muted">Eklediğin kafeleri yönet ve düzenle</p>
+            
+            <div class="user-stats">
+                <div class="stat-item">
+                    <span class="stat-number">{{ cafes|length }}</span>
+                    <span class="stat-label">Toplam Kafe</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ cafes|map(attribute='country')|list|unique|list|length }}</span>
+                    <span class="stat-label">Farklı Ülke</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ "%.1f"|format(cafes|map(attribute='coffee_price')|list|sum / cafes|length) if cafes else '0.0' }}</span>
+                    <span class="stat-label">Ortalama Fiyat</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="action-buttons">
+                    <a href="{{ url_for('normal.add_cafe') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-plus"></i> Yeni Kafe Ekle
+                    </a>
+                    <a href="{{ url_for('normal.user_panel') }}" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-user-cog"></i> Kullanıcı Paneli
+                    </a>
+                    <a href="{{ url_for('normal.home') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-home"></i> Ana Sayfa
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cafes Grid -->
+        {% if cafes %}
+        <div class="row" id="cafesGrid">
+            {% for cafe in cafes %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="user-cafe-card">
+                    <div class="cafe-image">
+                        <img src="{{ cafe.img_url if cafe.img_url and cafe.img_url.startswith(('http://', 'https://')) else 'https://via.placeholder.com/400x250/8B4513/FFFFFF?text=' + cafe.name|urlencode }}" 
+                             alt="{{ cafe.name }}" 
+                             onerror="this.src='https://via.placeholder.com/400x250/8B4513/FFFFFF?text=Kafe'">
+                        <div class="cafe-overlay">
+                            <a href="{{ url_for('normal.cafe_detail', cafe_id=cafe.id) }}" class="btn btn-light btn-sm">
+                                <i class="fas fa-eye"></i> Detay
+                            </a>
+                        </div>
+                    </div>
+                    <div class="cafe-content">
+                        <h5 class="cafe-title">{{ cafe.name }}</h5>
+                        <div class="cafe-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>{{ cafe.location }}, {{ cafe.country }}</span>
+                        </div>
+                        <div class="cafe-price">
+                            <i class="fas fa-lira-sign"></i>
+                            <span>{{ "%.2f"|format(cafe.coffee_price) }}</span>
+                        </div>
+                        <div class="cafe-amenities">
+                            {% if cafe.has_wifi %}
+                                <span class="amenity-badge wifi" title="WiFi">
+                                    <i class="fas fa-wifi"></i>
+                                </span>
+                            {% endif %}
+                            {% if cafe.has_toilet %}
+                                <span class="amenity-badge toilet" title="Tuvalet">
+                                    <i class="fas fa-toilet"></i>
+                                </span>
+                            {% endif %}
+                            {% if cafe.has_sockets %}
+                                <span class="amenity-badge sockets" title="Priz">
+                                    <i class="fas fa-plug"></i>
+                                </span>
+                            {% endif %}
+                            {% if cafe.can_take_calls %}
+                                <span class="amenity-badge calls" title="Telefon">
+                                    <i class="fas fa-phone"></i>
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div class="cafe-actions">
+                            <a href="{{ url_for('normal.cafe_detail', cafe_id=cafe.id) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye"></i> Görüntüle
+                            </a>
+                            <a href="{{ url_for('normal.update_cafe', cafe_id=cafe.id) }}" class="btn btn-outline-warning btn-sm">
+                                <i class="fas fa-edit"></i> Düzenle
+                            </a>
+                            {% if cafe.map_url and cafe.map_url.startswith(('http://', 'https://')) %}
+                                <a href="{{ cafe.map_url }}" target="_blank" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-map-marker-alt"></i> Harita
+                                </a>
+                            {% endif %}
+                            <button class="btn btn-outline-danger btn-sm" onclick="confirmDelete({{ cafe.id }}, '{{ cafe.name }}')">
+                                <i class="fas fa-trash-alt"></i> Sil
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state text-center py-5">
+            <div class="empty-icon mb-4">
+                <i class="fas fa-store fa-4x text-muted"></i>
+            </div>
+            <h3 class="text-muted mb-3">Henüz kafe eklememişsin</h3>
+            <p class="text-muted mb-4">İlk kafenizi ekleyerek başlayın!</p>
+            <a href="{{ url_for('normal.add_cafe') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> İlk Kafemi Ekle
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle text-warning"></i> Kafe Silme Onayı
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong id="cafeNameToDelete"></strong> adlı kafeyi silmek istediğinizden emin misiniz?</p>
+                <p class="text-muted small">Bu işlem geri alınamaz!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> İptal
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash-alt"></i> Evet, Sil
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(cafeId, cafeName) {
+    // Modal içeriğini güncelle
+    document.getElementById('cafeNameToDelete').textContent = cafeName;
+    
+    // Delete butonuna event listener ekle
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    confirmBtn.onclick = function() {
+        // POST request ile delete işlemini gerçekleştir
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{{ url_for('normal.delete_cafe', cafe_id=0) }}".replace('0', cafeId);
+        
+        // CSRF token ekle (Flask-WTF için)
+        const csrfToken = document.querySelector('meta[name=csrf-token]');
+        if (csrfToken) {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrf_token';
+            csrfInput.value = csrfToken.getAttribute('content');
+            form.appendChild(csrfInput);
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
+    };
+    
+    // Modal'ı göster
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

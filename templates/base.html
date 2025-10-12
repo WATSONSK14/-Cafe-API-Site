@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/base.css') }}?v=1.4" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/form.css') }}?v=1.4" rel="stylesheet">
+    <title>{% block title %}Kafe API Sitesi{% endblock %}</title>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('normal.home') }}">
+                <i class="fas fa-coffee coffee-icon"></i>
+                Kafe API Sitesi
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('normal.home') }}">
+                            <i class="fas fa-home"></i> Ana Sayfa
+                        </a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('normal.user_panel') }}">
+                                <i class="fas fa-user-cog"></i> Panel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('normal.user_cafes') }}">
+                                <i class="fas fa-store"></i> Kafelerim
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('normal.add_cafe') }}">
+                                <i class="fas fa-plus"></i> Kafe Ekle
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('normal.logout') }}">
+                                <i class="fas fa-sign-out-alt"></i> Çıkış
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('normal.register') }}">
+                                <i class="fas fa-user-plus"></i> Kayıt Ol
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('normal.login') }}">
+                                <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            {% block body %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-coffee"></i> Kafe API Sitesi</h5>
+                    <p>En iyi kafeleri keşfedin ve paylaşın.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h6>Hızlı Linkler</h6>
+                    <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                        <a href="{{ url_for('normal.home') }}">Ana Sayfa</a>
+                        <a href="{{ url_for('api.all_cafes_api') }}">API</a>
+                        {% if not current_user.is_authenticated %}
+                            <a href="{{ url_for('normal.register') }}">Kayıt Ol</a>
+                            <a href="{{ url_for('normal.login') }}">Giriş Yap</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 Kafe API Sitesi. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block title %}Kullanıcı Paneli - Kafe API Sitesi{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category == 'success' %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show flash-message" role="alert">
+                    <i class="fas fa-check-circle"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- User Panel Header -->
+        <div class="user-panel-header text-center mb-5">
+            <div class="user-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <h1 class="display-5 text-primary mb-3">
+                <i class="fas fa-cog"></i> Kullanıcı Paneli
+            </h1>
+            <p class="lead text-muted">Hoş geldin, <strong>{{ current_user.username }}</strong>!</p>
+        </div>
+
+        <!-- User Info Cards -->
+        <div class="row g-4 mb-5">
+            <!-- Profile Info Card -->
+            <div class="col-md-6">
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-user"></i>
+                        <h5>Profil Bilgileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span class="label">Kullanıcı Adı:</span>
+                            <span class="value">{{ current_user.username }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">E-posta:</span>
+                            <span class="value">{{ current_user.email }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Üyelik Tarihi:</span>
+                            <span class="value">{{ current_user.api_key_created_at.strftime('%d.%m.%Y') if current_user.api_key_created_at else 'Bilinmiyor' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Key Card -->
+            <div class="col-md-6">
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-key"></i>
+                        <h5>API Anahtarı</h5>
+                    </div>
+                    <div class="card-body">
+                         <div class="api-key-section">
+                             <div class="api-key-display">
+                                 <span class="api-key-masked" id="api-key-masked">••••••••••••••••••••••••••••••••</span>
+                                 <span class="api-key-visible" id="api-key-visible" style="display: none;">{{ api_key }}</span>
+                             </div>
+                             <button class="btn btn-outline-primary btn-sm" onclick="toggleApiKey()">
+                                 <i class="fas fa-eye"></i> Göster/Gizle
+                             </button>
+                         </div>
+                        <div class="api-status">
+                            <span class="status-badge {% if current_user.api_key_active %}active{% else %}inactive{% endif %}">
+                                <i class="fas fa-circle"></i>
+                                {% if current_user.api_key_active %}Aktif{% else %}Pasif{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row g-4 mb-5">
+            <div class="col-12">
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-bolt"></i>
+                        <h5>Hızlı İşlemler</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <a href="{{ url_for('normal.user_cafes') }}" class="action-btn">
+                                    <i class="fas fa-store"></i>
+                                    <span>Kafelerim</span>
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{{ url_for('normal.add_cafe') }}" class="action-btn">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Kafe Ekle</span>
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{{ url_for('api.all_cafes_api') }}" class="action-btn">
+                                    <i class="fas fa-code"></i>
+                                    <span>API Görüntüle</span>
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="action-btn" onclick="copyApiKey()">
+                                    <i class="fas fa-copy"></i>
+                                    <span>API Kopyala</span>
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{{ url_for('normal.home') }}" class="action-btn">
+                                    <i class="fas fa-home"></i>
+                                    <span>Ana Sayfa</span>
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{{ url_for('normal.logout') }}" class="action-btn logout-btn">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Çıkış Yap</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ current_user.cafes|length }}</h3>
+                        <p>Eklenen Kafe</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ current_user.cafes|map(attribute='location')|list|length if current_user.cafes else '0' }}</h3>
+                        <p>Farklı Lokasyon</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>
+                            {% set countries = current_user.cafes|map(attribute='country')|list %}
+                            {% if countries %}
+                                {% set country_counts = {} %}
+                                {% for country in countries %}
+                                    {% set _ = country_counts.update({country: country_counts.get(country, 0) + 1}) %}
+                                {% endfor %}
+                                {{ country_counts.items()|sort(attribute='1', reverse=true)|first|first if country_counts else 'Yok' }}
+                            {% else %}
+                                Yok
+                            {% endif %}
+                        </h3>
+                        <p>En Çok Eklenen Ülke</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden API Key for JavaScript -->
+<div id="full-api-key" style="display: none;">{{ api_key }}</div>
+
+<script>
+function toggleApiKey() {
+    const masked = document.getElementById('api-key-masked');
+    const visible = document.getElementById('api-key-visible');
+    const button = document.querySelector('button[onclick="toggleApiKey()"]');
+    const icon = button.querySelector('i');
+    
+    if (visible.style.display === 'none') {
+        // Göster
+        masked.style.display = 'none';
+        visible.style.display = 'inline';
+        icon.className = 'fas fa-eye-slash';
+        button.innerHTML = '<i class="fas fa-eye-slash"></i> Gizle';
+    } else {
+        // Gizle
+        masked.style.display = 'inline';
+        visible.style.display = 'none';
+        icon.className = 'fas fa-eye';
+        button.innerHTML = '<i class="fas fa-eye"></i> Göster';
+    }
+}
+
+function copyApiKey() {
+    // Bu fonksiyon gerçek API key'i kopyalar
+    const fullKey = document.getElementById('full-api-key').textContent;
+    navigator.clipboard.writeText(fullKey).then(function() {
+        // Toast notification göster
+        showToast('API anahtarı kopyalandı!', 'success');
+    });
+}
+
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type}`;
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+        ${message}
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

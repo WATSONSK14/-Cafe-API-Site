@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}{{ cafe.name }} - Kafe Detayı - Kafe API Sitesi{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category == 'success' %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show flash-message" role="alert">
+                    <i class="fas fa-check-circle"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- Cafe Detail Header -->
+        <div class="cafe-detail-header">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="cafe-info">
+                        <h1 class="cafe-title">
+                            <i class="fas fa-store"></i> {{ cafe.name }}
+                        </h1>
+                        <div class="cafe-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>{{ cafe.location }}, {{ cafe.country }}</span>
+                        </div>
+                        <div class="cafe-price">
+                            <i class="fas fa-lira-sign"></i>
+                            <span class="price-value">{{ "%.2f"|format(cafe.coffee_price) }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="cafe-actions">
+                        {% if cafe.map_url and cafe.map_url.startswith(('http://', 'https://')) %}
+                            <a href="{{ cafe.map_url }}" target="_blank" class="btn btn-primary btn-lg w-100 mb-3">
+                                <i class="fas fa-map-marker-alt"></i> Haritada Görüntüle
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('normal.home') }}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-arrow-left"></i> Ana Sayfaya Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cafe Details -->
+        <div class="row">
+            <!-- Cafe Image -->
+            <div class="col-lg-8">
+                <div class="cafe-image-section mb-4">
+                    <div class="cafe-image-container">
+                        <div class="cafe-main-image">
+                            <img src="{{ cafe.img_url if cafe.img_url and cafe.img_url.startswith(('http://', 'https://')) else 'https://via.placeholder.com/600x200/8B4513/FFFFFF?text=' + cafe.name|urlencode }}" 
+                                 alt="{{ cafe.name }}" 
+                                 onerror="this.src='https://via.placeholder.com/600x200/8B4513/FFFFFF?text=Kafe'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cafe Info Card -->
+            <div class="col-lg-4">
+                <div class="cafe-info-card">
+                    <h4 class="card-title">
+                        <i class="fas fa-info-circle"></i> Kafe Bilgileri
+                    </h4>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <span class="label">Kafe Adı:</span>
+                            <span class="value">{{ cafe.name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Konum:</span>
+                            <span class="value">{{ cafe.location }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Ülke:</span>
+                            <span class="value">{{ cafe.country }}</span>
+                        </div>
+                                <div class="info-item">
+                                    <span class="label">Kahve Fiyatı:</span>
+                                    <span class="value price">{{ "%.2f"|format(cafe.coffee_price) }}</span>
+                                </div>
+                        {% if cafe.map_url and cafe.map_url.startswith(('http://', 'https://')) %}
+                        <div class="info-item">
+                            <span class="label">Harita:</span>
+                            <a href="{{ cafe.map_url }}" target="_blank" class="value link">
+                                <i class="fas fa-external-link-alt"></i> Haritada Aç
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Amenities Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="cafe-amenities-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-star"></i> Özellikler
+                    </h3>
+                    <div class="amenities-grid">
+                        <div class="amenity-item {% if cafe.has_wifi %}available{% else %}not-available{% endif %}">
+                            <div class="amenity-icon">
+                                <i class="fas fa-wifi"></i>
+                            </div>
+                            <div class="amenity-info">
+                                <h5>WiFi</h5>
+                                <p>{% if cafe.has_wifi %}Ücretsiz internet erişimi{% else %}WiFi mevcut değil{% endif %}</p>
+                            </div>
+                        </div>
+
+                        <div class="amenity-item {% if cafe.has_toilet %}available{% else %}not-available{% endif %}">
+                            <div class="amenity-icon">
+                                <i class="fas fa-toilet"></i>
+                            </div>
+                            <div class="amenity-info">
+                                <h5>Tuvalet</h5>
+                                <p>{% if cafe.has_toilet %}Müşteri tuvaleti mevcut{% else %}Tuvalet mevcut değil{% endif %}</p>
+                            </div>
+                        </div>
+
+                        <div class="amenity-item {% if cafe.has_sockets %}available{% else %}not-available{% endif %}">
+                            <div class="amenity-icon">
+                                <i class="fas fa-plug"></i>
+                            </div>
+                            <div class="amenity-info">
+                                <h5>Priz</h5>
+                                <p>{% if cafe.has_sockets %}Elektrik prizi mevcut{% else %}Priz mevcut değil{% endif %}</p>
+                            </div>
+                        </div>
+
+                        <div class="amenity-item {% if cafe.can_take_calls %}available{% else %}not-available{% endif %}">
+                            <div class="amenity-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="amenity-info">
+                                <h5>Telefon</h5>
+                                <p>{% if cafe.can_take_calls %}Telefon konuşması yapılabilir{% else %}Telefon konuşması uygun değil{% endif %}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

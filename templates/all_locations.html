@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Tüm Konumlar - Kafe API Sitesi{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 text-primary mb-3">
+                <i class="fas fa-map-marker-alt"></i> Tüm Konumlar
+            </h1>
+            <p class="lead text-muted">Kafelerin bulunduğu tüm konumları keşfedin</p>
+        </div>
+
+        <!-- Locations Grid -->
+        <div class="row">
+            {% for location, count in locations %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="location-card" onclick="filterByLocation('{{ location }}')">
+                    <div class="location-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="location-info">
+                        <h5 class="location-name">{{ location }}</h5>
+                        <p class="location-count">{{ count }} kafe</p>
+                    </div>
+                    <div class="location-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Back Button -->
+        <div class="text-center mt-5">
+            <a href="{{ url_for('normal.home') }}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-arrow-left"></i> Ana Sayfaya Dön
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterByLocation(location) {
+    // Ana sayfaya yönlendir ve konum filtresini uygula
+    const url = new URL(window.location.origin + "{{ url_for('normal.home') }}");
+    url.searchParams.set('location', location);
+    window.location.href = url.toString();
+}
+</script>
+{% endblock %}

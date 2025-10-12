@@ -1,0 +1,440 @@
+{% extends "base.html" %}
+{% block title %} Ana Sayfa - Kafe API Sitesi {% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category == 'success' %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show flash-message" role="alert">
+                    <i class="fas fa-check-circle"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- Header Section -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 text-primary mb-3">
+                <i class="fas fa-coffee"></i> Kafe API Sitesi
+            </h1>
+            <p class="lead text-muted">En iyi kafeleri keşfedin ve paylaşın</p>
+            
+            {% if current_user.is_authenticated %}
+                <div class="welcome-user">
+                    <h4 class="text-success">
+                        <i class="fas fa-user-circle"></i> Hoş geldin, {{ current_user.username }}!
+                    </h4>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Main Content -->
+        <div class="row">
+            <!-- Left Sidebar - Filters -->
+            <div class="col-lg-3 mb-4">
+                <div class="filter-sidebar">
+                    <h5 class="filter-title">
+                        <i class="fas fa-filter"></i> Filtreler
+                    </h5>
+                    
+                    <!-- Search -->
+                    <div class="filter-section">
+                        <label class="filter-label">
+                            <i class="fas fa-search"></i> Arama
+                        </label>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Kafe ara...">
+                    </div>
+
+                    <!-- Country Filter -->
+                    <div class="filter-section">
+                        <label class="filter-label">
+                            <i class="fas fa-flag"></i> Ülke
+                        </label>
+                        <select class="form-select" id="countryFilter">
+                            <option value="">Tüm Ülkeler</option>
+                            {% set countries = cafes|map(attribute='country')|list|unique|sort %}
+                            {% for country in countries %}
+                                <option value="{{ country }}">{{ country }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Location Filter -->
+                    <div class="filter-section">
+                        <label class="filter-label">
+                            <i class="fas fa-map-marker-alt"></i> Konum
+                        </label>
+                        <select class="form-select" id="locationFilter" disabled>
+                            <option value="">Önce ülke seçin</option>
+                        </select>
+                    </div>
+
+                    <!-- Price Filter -->
+                    <div class="filter-section">
+                        <label class="filter-label">
+                            <i class="fas fa-lira-sign"></i> Fiyat Aralığı
+                        </label>
+                        <select class="form-select" id="priceFilter">
+                            <option value="">Tüm Fiyatlar</option>
+                            <option value="0-25">0-25 TL</option>
+                            <option value="25-50">25-50 TL</option>
+                            <option value="50-100">50-100 TL</option>
+                            <option value="100-250">100-250 TL</option>
+                            <option value="250-500">250-500 TL</option>
+                            <option value="500-1000">500-1000 TL</option>
+                            <option value="1000+">1000+ TL</option>
+                        </select>
+                    </div>
+
+                    <!-- Amenities Filter -->
+                    <div class="filter-section">
+                        <label class="filter-label">
+                            <i class="fas fa-star"></i> Özellikler
+                        </label>
+                        <div class="amenity-filters">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="wifiFilter">
+                                <label class="form-check-label" for="wifiFilter">
+                                    <i class="fas fa-wifi"></i> WiFi
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="toiletFilter">
+                                <label class="form-check-label" for="toiletFilter">
+                                    <i class="fas fa-toilet"></i> Tuvalet
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="socketsFilter">
+                                <label class="form-check-label" for="socketsFilter">
+                                    <i class="fas fa-plug"></i> Priz
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="callsFilter">
+                                <label class="form-check-label" for="callsFilter">
+                                    <i class="fas fa-phone"></i> Telefon
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clear Filters -->
+                    <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                        <i class="fas fa-times"></i> Filtreleri Temizle
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Content - Cafe Cards -->
+            <div class="col-lg-9">
+                <div class="cafes-header mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-coffee"></i> Kafeler
+                            <span class="badge bg-primary ms-2" id="cafeCount">{{ cafes|length }}</span>
+                        </h4>
+                        <div class="sort-options">
+                            <select class="form-select" id="sortSelect">
+                                <option value="name">İsme Göre</option>
+                                <option value="price">Fiyata Göre</option>
+                                <option value="location">Konuma Göre</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cafe Cards Grid -->
+                <div class="row" id="cafeGrid">
+                    {% for cafe in cafes %}
+                    <div class="col-md-6 col-xl-4 mb-4 cafe-card" 
+                         data-name="{{ cafe.name|lower }}" 
+                         data-location="{{ cafe.location|lower }}"
+                         data-country="{{ cafe.country }}"
+                         data-price="{{ cafe.coffee_price }}"
+                         data-wifi="{{ cafe.has_wifi|lower }}"
+                         data-toilet="{{ cafe.has_toilet|lower }}"
+                         data-sockets="{{ cafe.has_sockets|lower }}"
+                         data-calls="{{ cafe.can_take_calls|lower }}">
+                        <div class="card h-100 cafe-card-inner">
+                            <div class="cafe-image">
+                                <img src="{{ cafe.img_url if cafe.img_url and cafe.img_url.startswith(('http://', 'https://')) else 'https://via.placeholder.com/300x200/8B4513/FFFFFF?text=' + cafe.name|urlencode }}" 
+                                     class="card-img-top" alt="{{ cafe.name }}" 
+                                     onerror="this.src='https://via.placeholder.com/300x200/8B4513/FFFFFF?text=Kafe'">
+                                <div class="cafe-overlay">
+                                    {% if cafe.map_url and cafe.map_url.startswith(('http://', 'https://')) %}
+                                        <a href="{{ cafe.map_url }}" target="_blank" class="btn btn-light btn-sm">
+                                            <i class="fas fa-map-marker-alt"></i> Konum
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-light btn-sm" onclick="showLocationInfo('{{ cafe.location }}', '{{ cafe.country }}')">
+                                            <i class="fas fa-map-marker-alt"></i> Konum
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{{ url_for('normal.cafe_detail', cafe_id=cafe.id) }}" class="text-decoration-none text-primary">
+                                        {{ cafe.name }}
+                                    </a>
+                                </h5>
+                                <p class="card-text text-muted">
+                                    <i class="fas fa-map-marker-alt"></i> {{ cafe.location }}, {{ cafe.country }}
+                                </p>
+                                <div class="cafe-amenities">
+                                    {% if cafe.has_wifi %}
+                                        <span class="amenity-badge wifi">
+                                            <i class="fas fa-wifi"></i>
+                                        </span>
+                                    {% endif %}
+                                    {% if cafe.has_toilet %}
+                                        <span class="amenity-badge toilet">
+                                            <i class="fas fa-toilet"></i>
+                                        </span>
+                                    {% endif %}
+                                    {% if cafe.has_sockets %}
+                                        <span class="amenity-badge sockets">
+                                            <i class="fas fa-plug"></i>
+                                        </span>
+                                    {% endif %}
+                                    {% if cafe.can_take_calls %}
+                                        <span class="amenity-badge calls">
+                                            <i class="fas fa-phone"></i>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- No Results Message -->
+                <div id="noResults" class="text-center py-5" style="display: none;">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Arama kriterlerinize uygun kafe bulunamadı</h5>
+                    <p class="text-muted">Filtreleri değiştirerek tekrar deneyin</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const countryFilter = document.getElementById('countryFilter');
+    const locationFilter = document.getElementById('locationFilter');
+    const priceFilter = document.getElementById('priceFilter');
+    const wifiFilter = document.getElementById('wifiFilter');
+    const toiletFilter = document.getElementById('toiletFilter');
+    const socketsFilter = document.getElementById('socketsFilter');
+    const callsFilter = document.getElementById('callsFilter');
+    const sortSelect = document.getElementById('sortSelect');
+    const cafeGrid = document.getElementById('cafeGrid');
+    const cafeCount = document.getElementById('cafeCount');
+    const noResults = document.getElementById('noResults');
+
+    // Cafe data for filtering
+    const cafeData = [
+        {% for cafe in cafes %}
+        {
+            name: "{{ cafe.name }}",
+            location: "{{ cafe.location }}",
+            country: "{{ cafe.country }}",
+            price: {{ cafe.coffee_price }},
+            wifi: {{ cafe.has_wifi|lower }},
+            toilet: {{ cafe.has_toilet|lower }},
+            sockets: {{ cafe.has_sockets|lower }},
+            calls: {{ cafe.can_take_calls|lower }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    function updateLocationFilter() {
+        const selectedCountry = countryFilter.value;
+        locationFilter.innerHTML = '<option value="">Tüm Konumlar</option>';
+        
+        if (selectedCountry) {
+            // Seçilen ülkeye göre konumları filtrele
+            const countryCafes = cafeData.filter(cafe => cafe.country === selectedCountry);
+            const locations = [...new Set(countryCafes.map(cafe => cafe.location))].sort();
+            
+            locations.forEach(location => {
+                const option = document.createElement('option');
+                option.value = location;
+                option.textContent = location;
+                locationFilter.appendChild(option);
+            });
+            
+            if (locations.length > 10) {
+                const option = document.createElement('option');
+                option.value = 'all-locations';
+                option.textContent = 'Tüm Konumları Gör';
+                locationFilter.appendChild(option);
+            }
+            
+            locationFilter.disabled = false;
+        } else {
+            locationFilter.disabled = true;
+            locationFilter.innerHTML = '<option value="">Önce ülke seçin</option>';
+        }
+    }
+
+    function filterCafes() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedCountry = countryFilter.value;
+        const location = locationFilter.value.toLowerCase();
+        const priceRange = priceFilter.value;
+        const hasWifi = wifiFilter.checked;
+        const hasToilet = toiletFilter.checked;
+        const hasSockets = socketsFilter.checked;
+        const hasCalls = callsFilter.checked;
+
+        const cafeCards = document.querySelectorAll('.cafe-card');
+        let visibleCount = 0;
+
+        cafeCards.forEach(card => {
+            const name = card.dataset.name;
+            const cardLocation = card.dataset.location;
+            const cardCountry = card.dataset.country;
+            const price = parseFloat(card.dataset.price);
+            const wifi = card.dataset.wifi === 'true';
+            const toilet = card.dataset.toilet === 'true';
+            const sockets = card.dataset.sockets === 'true';
+            const calls = card.dataset.calls === 'true';
+
+            let show = true;
+
+            // Search filter
+            if (searchTerm && !name.includes(searchTerm)) {
+                show = false;
+            }
+
+            // Country filter
+            if (selectedCountry && cardCountry !== selectedCountry) {
+                show = false;
+            }
+
+            // Location filter
+            if (location && !cardLocation.includes(location)) {
+                show = false;
+            }
+
+            // Price filter
+            if (priceRange) {
+                const [min, max] = priceRange.split('-').map(p => p === '+' ? Infinity : parseFloat(p));
+                if (price < min || price > max) {
+                    show = false;
+                }
+            }
+
+            // Amenity filters
+            if (hasWifi && !wifi) show = false;
+            if (hasToilet && !toilet) show = false;
+            if (hasSockets && !sockets) show = false;
+            if (hasCalls && !calls) show = false;
+
+            card.style.display = show ? 'block' : 'none';
+            if (show) visibleCount++;
+        });
+
+        cafeCount.textContent = visibleCount;
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    function sortCafes() {
+        const sortBy = sortSelect.value;
+        const cafeCards = Array.from(document.querySelectorAll('.cafe-card'));
+        
+        cafeCards.sort((a, b) => {
+            switch(sortBy) {
+                case 'name':
+                    return a.dataset.name.localeCompare(b.dataset.name);
+                case 'price':
+                    return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                case 'location':
+                    return a.dataset.location.localeCompare(b.dataset.location);
+                default:
+                    return 0;
+            }
+        });
+
+        cafeCards.forEach(card => {
+            cafeGrid.appendChild(card);
+        });
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', filterCafes);
+    countryFilter.addEventListener('change', function() {
+        updateLocationFilter();
+        filterCafes();
+    });
+    locationFilter.addEventListener('change', function() {
+        if (this.value === 'all-locations') {
+            window.location.href = "{{ url_for('normal.all_locations') }}";
+        } else {
+            filterCafes();
+        }
+    });
+    priceFilter.addEventListener('change', filterCafes);
+    wifiFilter.addEventListener('change', filterCafes);
+    toiletFilter.addEventListener('change', filterCafes);
+    socketsFilter.addEventListener('change', filterCafes);
+    callsFilter.addEventListener('change', filterCafes);
+    sortSelect.addEventListener('change', sortCafes);
+
+    window.clearFilters = function() {
+        searchInput.value = '';
+        countryFilter.value = '';
+        locationFilter.value = '';
+        priceFilter.value = '';
+        wifiFilter.checked = false;
+        toiletFilter.checked = false;
+        socketsFilter.checked = false;
+        callsFilter.checked = false;
+        sortSelect.value = 'name';
+        updateLocationFilter();
+        filterCafes();
+        sortCafes();
+    };
+
+    // Location info modal for invalid map URLs
+    window.showLocationInfo = function(location, country) {
+        const modal = document.createElement('div');
+        modal.className = 'location-modal';
+        modal.innerHTML = `
+            <div class="location-modal-content">
+                <div class="location-modal-header">
+                    <h5><i class="fas fa-map-marker-alt"></i> Konum Bilgisi</h5>
+                    <button class="close-btn" onclick="this.closest('.location-modal').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="location-modal-body">
+                    <p><strong>Konum:</strong> ${location}</p>
+                    <p><strong>Ülke:</strong> ${country}</p>
+                    <p class="text-muted">Detaylı harita bilgisi mevcut değil.</p>
+                </div>
+                <div class="location-modal-footer">
+                    <button class="btn btn-primary" onclick="this.closest('.location-modal').remove()">
+                        <i class="fas fa-check"></i> Tamam
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    };
+});
+</script>
+{% endblock %}
