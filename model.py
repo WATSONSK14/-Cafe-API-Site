@@ -6,7 +6,9 @@ from decimal import Decimal
 import os
 import secrets
 from cryptography.fernet import Fernet, InvalidToken
-from extensions import db
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 from flask import current_app
 
 
