@@ -1,21 +1,21 @@
-# ☕ Kafe API Sitesi
+# ☕ Cafe API Site
 
-Modern ve kullanıcı dostu bir kafe keşif platformu. Kullanıcılar kafe ekleyebilir, arayabilir ve filtreleyebilir.
+A modern and user-friendly café discovery platform. Users can add, search, and filter cafés.
 
-## 🌟 Özellikler
+## 🌟 Features
 
-- **Kafe Keşfi**: Dünya çapında kafeleri keşfedin
-- **Akıllı Filtreleme**: Ülke, konum, fiyat ve özelliklere göre filtreleme
-- **Kullanıcı Paneli**: Kendi kafelerinizi yönetin
-- **REST API**: Tam entegre API desteği
-- **Responsive Tasarım**: Mobil ve masaüstü uyumlu
-- **Güvenli Kimlik Doğrulama**: JWT tabanlı API key sistemi
+- **Cafe Discovery**: Explore cafés worldwide
+- **Smart Filtering**: Filter by country, location, price, and features
+- **User Panel**: Manage your own cafés
+- **REST API**: Fully integrated API support
+- **Responsive Design**: Compatible with mobile and desktop
+- **Secure Authentication**: JWT-based API key system
 
-## 🚀 Canlı Demo
+## 🚀 Live Demo
 
 **Site:** [https://cafe-api-site.onrender.com](https://cafe-api-site.onrender.com)
 
-## 🛠️ Teknolojiler
+## 🛠️ Technologies
 
 - **Backend**: Flask, SQLAlchemy, Flask-Login
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
@@ -23,9 +23,9 @@ Modern ve kullanıcı dostu bir kafe keşif platformu. Kullanıcılar kafe ekley
 - **API**: RESTful API with JWT Authentication
 - **Deployment**: Render.com
 
-## 📋 Gereksinimler
+## 📋 Requirements
 
-### Python Paketleri
+### Python Packages
 ```
 Flask==2.3.3
 Flask-SQLAlchemy==3.0.5
@@ -38,20 +38,21 @@ python-dotenv==1.0.0
 email-validator==2.1.0
 ```
 
-### Sistem Gereksinimleri
+### System Requirements
 - Python 3.11+
 - SQLite3 (Development)
-- PostgreSQL (Production - Opsiyonel)
+- PostgreSQL (Production - Optional)
 
-## 🚀 Kurulum
+## 🚀 Installation
 
-### 1. Repository'yi Klonlayın
+### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/WATSONSK14/cafe-api-site.git
 cd cafe-api-site
 ```
 
-### 2. Virtual Environment Oluşturun
+### 2. Create a Virtual Environment
 ```bash
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
@@ -59,45 +60,46 @@ source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate  # Windows
 ```
 
-### 3. Dependencies Yükleyin
+### 3. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Environment Variables Ayarlayın
-`.env` dosyası oluşturun:
+### 4. Set Environment Variables
+Create a `.env` file:
 ```env
 FLASK_ENV=development
 SECRET_KEY=your-secret-key-here
 FERNET_KEY=your-fernet-key-here
 DATABASE_URL=sqlite:///cafes.db
-```
 
-### 5. Uygulamayı Çalıştırın
+
+### 5. Run the Application
 ```bash
 python main.py
 ```
 
-Uygulama `http://localhost:5000` adresinde çalışacaktır.
+The application will run at `http://localhost:5000`.
 
-## 📚 API Dokümantasyonu
+## 📚 API Documentation
 
 ### Base URL
+
 ```
 https://cafe-api-site.onrender.com/v1
 ```
 
 ### Authentication
-API key gerektiren endpoint'ler için `X-API-KEY` header'ı kullanın.
+For endpoints requiring an API key, use the `X-API-KEY` header.
 
 ---
 
-## 👤 Kullanıcı İşlemleri
+## 👤 User Operations
 
-### Kullanıcı Kaydı
+### User Registration
 **Endpoint:** `POST /v1/users`
 
-**API Key Gerekli:** ❌ Hayır
+**API Key Required:** ❌ No
 
 **Headers:**
 ```
@@ -121,18 +123,18 @@ Content-Type: application/json
 }
 ```
 
-**Hata Durumları:**
-- `400`: Geçersiz veri
-- `409`: Kullanıcı zaten mevcut
+**Error Cases:**
+- `400`: Invalid data
+- `409`: User already exists
 
 ---
 
-## ☕ Kafe İşlemleri
+## ☕ Cafe Operations
 
-### Kafe Ekleme
+### Add a Cafe
 **Endpoint:** `POST /v1/cafes/{username}`
 
-**API Key Gerekli:** ✅ Evet
+**API Key Required:** ✅ Yes
 
 **Headers:**
 ```
@@ -141,18 +143,18 @@ X-API-KEY: your-api-key-here
 ```
 
 **Required Fields:**
-- `name` (string): Kafe adı
-- `location` (string): Konum bilgisi
-- `country` (string): Ülke
-- `coffee_price` (float): Kahve fiyatı
+- `name` (string): Cafe name
+- `location` (string): Location information
+- `country` (string): Country
+- `coffee_price` (float): Coffee price
 
 **Optional Fields:**
-- `img_url` (string): Kafe fotoğrafı URL'i
-- `map_url` (string): Harita linki
-- `has_wifi` (boolean): WiFi var mı? (default: false)
-- `has_toilet` (boolean): Tuvalet var mı? (default: false)
-- `has_sockets` (boolean): Priz var mı? (default: false)
-- `can_take_calls` (boolean): Telefon konuşması yapılabilir mi? (default: false)
+- `img_url` (string): Cafe photo URL
+- `map_url` (string): Map link
+- `has_wifi` (boolean): Has WiFi? (default: false)
+- `has_toilet` (boolean): Has toilet? (default: false)
+- `has_sockets` (boolean): Has power sockets? (default: false)
+- `can_take_calls` (boolean): Can take phone calls? (default: false)
 
 **Request Body:**
 ```json
@@ -188,15 +190,15 @@ X-API-KEY: your-api-key-here
 }
 ```
 
-**Hata Durumları:**
-- `401`: Geçersiz API key
-- `400`: Geçersiz veri
-- `404`: Kullanıcı bulunamadı
+**Error Cases:**
+- `401`: Invalid API key
+- `400`: Invalid data
+- `404`: User not found
 
-### Tüm Kafeleri Listele
+### List All Cafes
 **Endpoint:** `GET /v1/cafes`
 
-**API Key Gerekli:** ❌ Hayır
+**API Key Required:** ❌ No
 
 **Response (200):**
 ```json
@@ -217,10 +219,10 @@ X-API-KEY: your-api-key-here
 }
 ```
 
-### Kullanıcının Kafelerini Listele
+### List User's Cafes
 **Endpoint:** `GET /v1/cafes/{username}`
 
-**API Key Gerekli:** ✅ Evet
+**API Key Required:** ✅ Yes
 
 **Headers:**
 ```
@@ -246,10 +248,10 @@ X-API-KEY: your-api-key-here
 }
 ```
 
-### Kafe Güncelleme
+### Update a Cafe
 **Endpoint:** `PUT /v1/cafes/{username}/{cafe_id}`
 
-**API Key Gerekli:** ✅ Evet
+**API Key Required:** ✅ Yes
 
 **Headers:**
 ```
@@ -257,7 +259,7 @@ Content-Type: application/json
 X-API-KEY: your-api-key-here
 ```
 
-**Request Body:** (Kafe ekleme ile aynı format)
+**Request Body:** (Same format as adding a cafe.)
 
 **Response (200):**
 ```json
@@ -277,10 +279,10 @@ X-API-KEY: your-api-key-here
 }
 ```
 
-### Kafe Silme
+### Delete a Cafe
 **Endpoint:** `DELETE /v1/cafes/{username}/{cafe_id}`
 
-**API Key Gerekli:** ✅ Evet
+**API Key Required:** ✅ Yes
 
 **Headers:**
 ```
@@ -296,13 +298,13 @@ X-API-KEY: your-api-key-here
 
 ---
 
-## 🔐 API Key Yönetimi
+## 🔐 API Key Management
 
-### API Key Alma
-Kullanıcı kaydı sırasında otomatik olarak API key oluşturulur ve response'da döndürülür.
+### Obtaining an API Key
+An API key is automatically generated during user registration and returned in the response.
 
-### API Key Kullanımı
-API key gerektiren endpoint'lerde `X-API-KEY` header'ı ile gönderin:
+### Using the API Key
+For endpoints requiring an API key, send it in the `X-API-KEY` header:
 
 ```python
 import requests
@@ -321,33 +323,33 @@ response = requests.post(
 
 ---
 
-## 🌐 Web Arayüzü
+## 🌐 Web Interface
 
-### Ana Sayfa
+### Home Page
 - **URL:** `/`
-- **Özellikler:** Kafe showcase, filtreleme, arama
+- **Features:** Cafe showcase, filtering, search
 
-### Kullanıcı Paneli
+### User Panel
 - **URL:** `/panel`
-- **Özellikler:** İstatistikler, API key yönetimi
+- **Features:** Statistics, API key management
 
-### Kafelerim
+### My Cafes
 - **URL:** `/kafelerim`
-- **Özellikler:** Kendi kafelerinizi yönetin
+- **Features:** Manage your own cafes
 
-### Kafe Ekleme
+### Add Cafe
 - **URL:** `/kafe-ekle`
-- **Özellikler:** Yeni kafe ekleme formu
+- **Features:** New cafe submission form
 
 ---
 
 ## 🚀 Deployment
 
-### Render.com ile Deploy
+### Deploy with Render.com
 
-1. **Repository'yi GitHub'a push edin**
-2. **Render.com'da yeni Web Service oluşturun**
-3. **Environment Variables ekleyin:**
+1. **Push the repository to GitHub**
+2. **Create a new Web Service on Render.com**
+3. **Add Environment Variables:**
    ```
    FLASK_ENV=production
    SECRET_KEY=your-secret-key
@@ -358,17 +360,17 @@ response = requests.post(
 
 ### Environment Variables
 
-**Production için gerekli:**
+**Required for Production:**
 - `FLASK_ENV=production`
-- `SECRET_KEY`: Flask güvenlik anahtarı
-- `FERNET_KEY`: API key şifreleme anahtarı
-- `DATABASE_URL`: PostgreSQL URL (opsiyonel)
+- `SECRET_KEY`: Flask security key
+- `FERNET_KEY`: API key encryption key
+- `DATABASE_URL`: PostgreSQL URL (optional)
 
 ---
 
-## 📝 Örnek Kullanım
+## 📝 Example Usage
 
-### Python ile API Kullanımı
+### Using the API with Python
 
 ```python
 import requests
@@ -411,23 +413,23 @@ print(response.json())
 
 ---
 
-## 🤝 Katkıda Bulunma
+## 🤝 Contributing
 
-1. Fork yapın
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Commit yapın (`git commit -m 'Add amazing feature'`)
-4. Push yapın (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
-
----
-
-## 📄 Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ---
 
-## 👨‍💻 Geliştirici
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 👨‍💻 Developer
 
 **WATSONSK14**
 - GitHub: [@WATSONSK14](https://github.com/WATSONSK14)
@@ -435,17 +437,17 @@ Bu proje MIT lisansı altında lisanslanmıştır.
 
 ---
 
-## 🎯 Gelecek Özellikler
+## 🎯 Future Features
 
-- [ ] Kafe yorumları ve puanlama
-- [ ] Kullanıcı profilleri
-- [ ] Kafe favorileme sistemi
-- [ ] Mobil uygulama
-- [ ] Real-time bildirimler
-- [ ] Kafe fotoğraf yükleme
-- [ ] Harita entegrasyonu
-- [ ] Sosyal medya paylaşımı
+- [ ] Cafe reviews and ratings
+- [ ] User profiles
+- [ ] Cafe favoriting system
+- [ ] Mobile application
+- [ ] Real-time notifications
+- [ ] Cafe photo uploads
+- [ ] Map integration
+- [ ] Social media sharing
 
 ---
 
-**☕ En iyi kafeleri keşfedin ve paylaşın!**
+**☕ Discover and share the best cafes!**
