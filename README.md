@@ -378,7 +378,7 @@ import requests
 # Base URL
 BASE_URL = "https://cafe-api-site.onrender.com/v1"
 
-# Kullanıcı kaydı
+# User registration
 user_data = {
     "username": "testuser",
     "email": "test@example.com",
@@ -388,15 +388,15 @@ user_data = {
 response = requests.post(f"{BASE_URL}/users", json=user_data)
 print(response.json())
 
-# API Key al
+# Get API Key
 api_key = response.json()["user"].split("API-KEY: ")[1]
 
-# Kafe ekleme
+# Add a cafe
 headers = {"X-API-KEY": api_key, "Content-Type": "application/json"}
 
 cafe_data = {
     "name": "Test Cafe",
-    "location": "İstanbul, Türkiye",
+    "location": "Istanbul, Turkey",
     "country": "Turkey",
     "coffee_price": 25.50,
     "has_wifi": True,
