@@ -330,15 +330,12 @@ response = requests.post(
 - **Features:** Cafe showcase, filtering, search
 
 ### User Panel
-- **URL:** `/panel`
+- **URL:** `/user/panel`
 - **Features:** Statistics, API key management
 
-### My Cafes
-- **URL:** `/kafelerim`
-- **Features:** Manage your own cafes
 
 ### Add Cafe
-- **URL:** `/kafe-ekle`
+- **URL:** `/add`
 - **Features:** New cafe submission form
 
 ---
