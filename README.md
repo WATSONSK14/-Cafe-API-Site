@@ -430,8 +430,6 @@ This project is licensed under the MIT License.
 
 **WATSONSK14**
 - GitHub: [@WATSONSK14](https://github.com/WATSONSK14)
-- Portfolio: [cafe-api-site.onrender.com](https://cafe-api-site.onrender.com)
-
 ---
 
 ## 🎯 Future Features
