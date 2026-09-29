@@ -9,7 +9,7 @@ A modern and user-friendly café discovery platform. Users can add, search, and 
 - **User Panel**: Manage your own cafés
 - **REST API**: Fully integrated API support
 - **Responsive Design**: Compatible with mobile and desktop
-- **Secure Authentication**: JWT-based API key system
+- **Secure Authentication**: API key authentication (keys encrypted with Fernet)
 
 ## 🚀 Live Demo
 
@@ -20,7 +20,7 @@ A modern and user-friendly café discovery platform. Users can add, search, and 
 - **Backend**: Flask, SQLAlchemy, Flask-Login
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
 - **Database**: SQLite (Development) / PostgreSQL (Production)
-- **API**: RESTful API with JWT Authentication
+- **API**: RESTful API with API-key authentication
 - **Deployment**: Render.com
 
 ## 📋 Requirements
